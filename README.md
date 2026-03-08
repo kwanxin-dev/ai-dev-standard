@@ -26,6 +26,7 @@
 ├── CODEX.md                           ← Codex CLI 專屬擴展
 ├── GEMINI.md                          ← Gemini CLI 專屬擴展
 ├── ANTIGRAVITY.md                     ← Antigravity IDE 專屬擴展
+├── skills-development-guide.md         ← Skill 開發規範指南（架構/結構/加載/執行/安全）
 ├── skills-memory-standard.md          ← Skill + ai-memory-hub 治理標準草案
 ├── 新專案開發流程規範.html              ← 開發流程規範（HTML 視覺化版）
 ├── github-project-lifecycle-sop.md    ← GitHub 權限/PR/合併完整 SOP（實戰版）
@@ -51,6 +52,7 @@ CLAUDE.md        CODEX.md       GEMINI.md         ANTIGRAVITY.md
 | **CODEX.md** | 擴展 | Skill 優先觸發、最小變更策略、記憶回寫一致性 |
 | **GEMINI.md** | 擴展 | 分層指令架構、多模態運用、YAML 工具描述模板、效能追蹤指標 |
 | **ANTIGRAVITY.md** | 擴展 | IDE 任務啟動檢查、Skill 安裝檢核、記憶追溯要求 |
+| **skills-development-guide.md** | 開發規範 | Skill 架構理念、資料夾結構、漸進式加載(L1→L2→L3)、確定性執行、跨工具映射、安全治理 |
 | **skills-memory-standard.md** | 治理 | Skill 中央倉 + 記憶中央倉、append-only、成功/失敗案例記錄 |
 
 ---
@@ -158,11 +160,12 @@ cd C:\path\to\your\new-project
 ### 調整記憶目錄
 依據專案規模調整 `.ai-memory/` 的子目錄結構，但保持 `_index.md` 索引機制。
 
-### Skill + 記憶治理
-若專案要採用四環境共用 skill 與集中記憶，請依 `skills-memory-standard.md` 建立：
-- 獨立 skill 倉（`ai-skills`）
-- 獨立記憶倉（`ai-memory-hub`）
-- append-only 事件寫入與成功/失敗 case 留存
+### Skill 開發與治理
+- **開發規範**：依 [`skills-development-guide.md`](./skills-development-guide.md) 建立 Skill，遵循單一內核原則、標準化資料夾結構、漸進式加載（L1→L2→L3）、確定性執行
+- **記憶治理**：依 [`skills-memory-standard.md`](./skills-memory-standard.md) 建立集中記憶管理：
+  - 獨立 skill 倉（`ai-skills`）
+  - 獨立記憶倉（`ai-memory-hub`）
+  - append-only 事件寫入與成功/失敗 case 留存
 
 ---
 

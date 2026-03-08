@@ -132,7 +132,22 @@ Q3: 任務是否需要人工介入或有大量動態選項？
 └── coding-standards.md          ← 開發規範
 ```
 
-#### 集中記憶與 Skill 觸發治理（建議標準）
+#### Skill 架構原則（強制）
+
+> 完整開發規範請參閱 [`skills-development-guide.md`](./skills-development-guide.md)。
+
+- **單一內核**：不為每個業務場景建立獨立 Agent，透過加載不同 Skills（技能包）擴展能力。
+- **解耦連接與邏輯**：
+  - MCP（連接層）：僅負責「能連上什麼」（資料庫、API），不涉及業務判斷。
+  - Skills（邏輯層）：負責「怎麼把事做對」（SOP、業務規則、檢查點、回覆格式）。
+- **漸進式加載（L1 → L2 → L3）**：
+  - L1：系統啟動時僅加載 Skill 的 `name` 與 `description`（元數據預加載）。
+  - L2：任務匹配時才讀取 `SKILL.md` 完整 SOP 與邊界條件。
+  - L3：具體執行步驟需要時才觸發讀取 `reference.md` 或執行 `scripts/`。
+- **確定性執行**：數值計算、排序、大規模格式化禁止模型直接推理，必須封裝腳本執行。
+- **標準化結構**：每個 Skill 必須包含 `SKILL.md`（必需），可選 `reference.md`、`forms.md`/`templates.md`、`scripts/`。
+
+#### 集中記憶與 Skill 觸發治理（強制）
 
 - Skill 來源與記憶來源分離管理：
   - Skill 中央倉：`https://github.com/<org>/ai-skills`
@@ -395,6 +410,7 @@ CLAUDE.md        CODEX.md       GEMINI.md         ANTIGRAVITY.md
 ├── CODEX.md               ← Codex CLI 專屬擴展
 ├── GEMINI.md              ← Gemini CLI 專屬擴展
 ├── ANTIGRAVITY.md         ← Antigravity IDE 專屬擴展
+├── skills-development-guide.md ← Skill 開發規範指南（架構、結構、加載、執行、安全）
 ├── skills-memory-standard.md ← skill 與集中記憶治理規範
 ├── .ai-memory/            ← 所有 AI 共用記憶庫
 │   ├── decisions/         ← 架構決策（按主題分檔）

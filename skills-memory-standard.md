@@ -36,7 +36,7 @@ projects/
 ```json
 {
   "event_id": "evt_20260225_001",
-  "project": "kwanxin-dev/sp",
+  "project": "<your-org>/<your-repo>",
   "module": "apps-web-workorder",
   "timestamp": "2026-02-25T11:28:00Z",
   "actor": "codex",

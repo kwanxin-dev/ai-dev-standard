@@ -1,13 +1,15 @@
 # GitHub 新專案到合併完整 SOP（管理者 + 工程師 + AI）
 
 > 目標：強制「工程師不能直推主線」，且所有變更必須走 Preview + PR + 管理者核准。
+>
+> ⚠️ 本文件使用佔位符（`<your-org>`、`<your-repo>`、`<main-branch>`、`<your-staging-domain>`），請依專案實際值替換。
 
 ## 1. 新專案建立（管理者）
 
-1. 建立 GitHub Organization（建議名稱固定，例如 `kwanxin-dev`）。
+1. 建立 GitHub Organization（建議名稱固定，例如 `<your-org>`）。
 2. 專案 repo 建在 Organization 下（不要放個人帳號）。
 3. 私有 repo 要啟用平台層強制保護，至少使用 GitHub Team。
-4. 預設主線只保留一條（例如 `surprise/bootstrap`）。
+4. 預設主線只保留一條（例如 `main`）。
 
 ## 2. 權限模型（管理者）
 
@@ -16,7 +18,7 @@
 3. 工程師必須是 **Organization member**，不是只有 Outside collaborator。
 4. 建議用 Team 管 repo 權限：
    - Team: `engineers`
-   - Repository: `sp`
+   - Repository: `<your-repo>`
    - Permission: `Write`
 
 ## 3. 工程師加入流程（管理者 + 工程師）
@@ -29,8 +31,8 @@
 ## 4. PAT 流程（工程師）
 
 1. 工程師建立 Fine-grained PAT。
-2. `Resource owner` 必須選 Organization（例如 `kwanxin-dev`）。
-3. `Repository access` 選 `Only select repositories`，勾目標 repo（例如 `sp`）。
+2. `Resource owner` 必須選 Organization（例如 `<your-org>`）。
+3. `Repository access` 選 `Only select repositories`，勾目標 repo（例如 `<your-repo>`）。
 4. 權限至少開：
    - `Contents: Read and write`
    - （需要查/觸發 workflow 時）`Actions/Workflows: Read and write`
@@ -40,7 +42,7 @@
 
 在 repo `Settings -> Rulesets -> New branch ruleset`：
 
-1. Target branches：至少包含 `surprise/bootstrap`（若有 `main` 也要包含）。
+1. Target branches：至少包含 `<main-branch>`（若有 `main` 也要包含）。
 2. `Enforcement`: `Active`。
 3. `Bypass list`：只留 `Repository admin`（不要放工程師）。
 4. 必勾規則：
@@ -67,7 +69,7 @@
 使用工程師 PAT 驗證：
 
 1. `push` 到 `ai/<engineer>/<task>`：應成功。
-2. 直接 `push` 到 `surprise/bootstrap`：必須被拒絕（GH013 / ruleset violation）。
+2. 直接 `push` 到 `<main-branch>`：必須被拒絕（GH013 / ruleset violation）。
 3. 開 PR，但不滿足 approval/check：必須不能 merge。
 
 ## 8. 工程師日常提交流程
@@ -75,7 +77,7 @@
 1. 從最新主線開分支：`ai/<engineer>/<task>`。
 2. 完成功能後 commit + push 到該分支。
 3. 驗證 Preview：
-   - `https://sp-staging.kwanxin.com/p/<engineer>/<task>/`
+   - `https://<your-staging-domain>/p/<engineer>/<task>/`
 4. 每次修改完成回報（含中間交付）必須附上「合併前預覽網址」，且只需提供本次修改目標頁（若有指定單號/ID 需附完整路徑；除非另外要求，不需附分支入口或列表頁）。
 5. 必測清單：
    - `/api/auth/me`

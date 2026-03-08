@@ -121,7 +121,7 @@ name: CI
 
 on:
   pull_request:
-    branches: [main, develop]
+    branches: [main]
 
 jobs:
   check:
@@ -129,17 +129,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: 安裝依賴
-        run: npm install
-
-      - name: 程式碼檢查
-        run: npm run lint
-
-      - name: 單元測試
-        run: npm test
-
-      - name: 建置確認
-        run: npm run build
+      # TODO: 依專案語言替換以下步驟
+      # Node.js:  npm install && npm run lint && npm test && npm run build
+      # PHP:      composer install && vendor/bin/phpunit
+      # Python:   pip install -r requirements.txt && pytest
+      # Go:       go build ./... && go test ./...
+      - name: Build & Test
+        run: echo "請替換為專案實際的 build/test 命令"
 EOF
 
 echo "  ✅ .github/workflows/ci.yml 建立完成"
@@ -192,17 +188,87 @@ EOF
 
 echo "  ✅ .gitignore 建立完成"
 
-# --- 5. 完成 ---
+# --- 5. 下載 AI 開發標準檔案並啟用自動同步 ---
+echo "📥 下載 AI 開發標準檔案..."
+
+AI_STD_REPO="${AI_STD_REPO:-<your-org>/ai-dev-standard}"
+AI_STD_REF="${AI_STD_REF:-main}"
+AI_STD_FILES=(
+  "AGENTS.md"
+  "CLAUDE.md"
+  "CODEX.md"
+  "GEMINI.md"
+  "ANTIGRAVITY.md"
+  "skills-development-guide.md"
+  "skills-memory-standard.md"
+)
+
+DOWNLOAD_OK=true
+for f in "${AI_STD_FILES[@]}"; do
+  URL="https://raw.githubusercontent.com/${AI_STD_REPO}/${AI_STD_REF}/${f}"
+  HTTP_CODE=$(curl -sL -w "%{http_code}" -o "$f" "$URL")
+  if [[ "$HTTP_CODE" == "200" ]]; then
+    echo "  ✅ ${f}"
+  else
+    echo "  ❌ ${f}（HTTP ${HTTP_CODE}）"
+    DOWNLOAD_OK=false
+  fi
+done
+
+# 取得最新 commit SHA
+LATEST_SHA=$(curl -sL \
+  "https://api.github.com/repos/${AI_STD_REPO}/commits/${AI_STD_REF}" \
+  | python3 -c "import sys,json; print(json.load(sys.stdin).get('sha','unknown'))" 2>/dev/null || echo "unknown")
+
+# 建立同步元數據
+cat > .ai-dev-standard.json << EOF
+{
+  "source_repo": "${AI_STD_REPO}",
+  "source_ref": "${AI_STD_REF}",
+  "synced_commit": "${LATEST_SHA}",
+  "synced_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+  "files": $(python3 -c "import json; print(json.dumps([$(printf '"%s",' "${AI_STD_FILES[@]}" | sed 's/,$//')]))")
+}
+EOF
+echo "  ✅ .ai-dev-standard.json"
+
+# 安裝同步腳本
+mkdir -p .github/scripts
+curl -sL "https://raw.githubusercontent.com/${AI_STD_REPO}/${AI_STD_REF}/scripts/sync-ai-standard.sh" \
+  -o .github/scripts/sync-ai-standard.sh
+chmod +x .github/scripts/sync-ai-standard.sh
+echo "  ✅ .github/scripts/sync-ai-standard.sh"
+
+# 安裝 GitHub Action
+curl -sL "https://raw.githubusercontent.com/${AI_STD_REPO}/${AI_STD_REF}/scripts/sync-ai-standard.yml" \
+  -o .github/workflows/sync-ai-standard.yml
+echo "  ✅ .github/workflows/sync-ai-standard.yml"
+
+# 安裝 Git Hook
+mkdir -p .githooks
+curl -sL "https://raw.githubusercontent.com/${AI_STD_REPO}/${AI_STD_REF}/scripts/post-merge-hook.sh" \
+  -o .githooks/post-merge
+chmod +x .githooks/post-merge
+git config core.hooksPath .githooks 2>/dev/null || true
+echo "  ✅ .githooks/post-merge (git pull 後自動檢查更新)"
+
+echo "  ✅ AI 開發標準已下載並啟用自動同步"
+
+# --- 6. 完成 ---
 echo ""
 echo "=========================================="
 echo "🎉 專案初始化完成！"
 echo "=========================================="
 echo ""
 echo "📋 下一步："
-echo "  1. 複製 AGENTS.md, CLAUDE.md, CODEX.md, GEMINI.md, ANTIGRAVITY.md 到專案根目錄"
-echo "  2. 修改 CODEOWNERS 中的 @owner 為老闆的 GitHub 帳號"
-echo "  3. 根據專案類型修改 .github/workflows/ci.yml"
-echo "  4. 參考 skills-memory-standard.md 配置 skill 與 ai-memory-hub"
-echo "  5. git init && git add . && git commit -m 'init: 專案初始化'"
-echo "  6. git remote add origin <repo-url> && git push -u origin main"
+echo "  1. 修改 CODEOWNERS 中的 @owner 為老闆的 GitHub 帳號"
+echo "  2. 根據專案類型修改 .github/workflows/ci.yml"
+echo "  3. 如需專案專屬設定，建立 CLAUDE.local.md（如 DB 連線資訊）"
+echo "  4. git init && git add . && git commit -m 'init: 專案初始化'"
+echo "  5. git remote add origin <repo-url> && git push -u origin main"
+echo ""
+echo "🔄 AI 標準自動同步已啟用："
+echo "  - GitHub Action：每週一自動檢查並建立 PR"
+echo "  - Git Hook：每次 git pull 後提示更新"
+echo "  - 手動同步：bash .github/scripts/sync-ai-standard.sh"
 echo ""

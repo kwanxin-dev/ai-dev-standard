@@ -77,9 +77,16 @@ cd C:\path\to\your\new-project
 .\init-project.ps1
 ```
 
-腳本會自動建立：`.ai-memory/` 目錄結構、`.github/workflows/ci.yml`、`CODEOWNERS`、`.gitignore`
+腳本會自動建立：`.ai-memory/` 目錄結構、`.github/workflows/ci.yml`、`CODEOWNERS`、`.gitignore`，並**自動下載 AI 開發標準檔案 + 啟用自動同步**。
 
-### 方法 3：手動設定
+### 方法 3：既有專案啟用自動同步
+
+```bash
+# 在既有專案根目錄執行（會自動備份現有檔案為 *.local.md）
+curl -sL https://raw.githubusercontent.com/<your-org>/ai-dev-standard/main/enable-sync.sh | bash
+```
+
+### 方法 4：手動設定
 
 1. 將 `AGENTS.md`、`CLAUDE.md`、`CODEX.md`、`GEMINI.md`、`ANTIGRAVITY.md` 複製到你的專案根目錄
 2. 建立 `.ai-memory/` 目錄結構（參考 AGENTS.md）
@@ -89,11 +96,23 @@ cd C:\path\to\your\new-project
 
 | AI 工具 | 會讀取的檔案 |
 |---------|-------------|
-| **Codex CLI** | AGENTS.md → CODEX.md → `.ai-memory/` |
-| **Claude Code** | AGENTS.md → CLAUDE.md → `.ai-memory/` |
-| **Gemini CLI** | AGENTS.md → GEMINI.md → `.ai-memory/` |
-| **Antigravity IDE** | AGENTS.md → ANTIGRAVITY.md → `.ai-memory/` |
-| **GitHub Copilot / Cursor** | AGENTS.md → `.ai-memory/` |
+| **Codex CLI** | AGENTS.md → CODEX.md → `*.local.md` → `.ai-memory/` |
+| **Claude Code** | AGENTS.md → CLAUDE.md → `CLAUDE.local.md` → `.ai-memory/` |
+| **Gemini CLI** | AGENTS.md → GEMINI.md → `*.local.md` → `.ai-memory/` |
+| **Antigravity IDE** | AGENTS.md → ANTIGRAVITY.md → `*.local.md` → `.ai-memory/` |
+| **GitHub Copilot / Cursor** | AGENTS.md → `*.local.md` → `.ai-memory/` |
+
+### 🔄 自動同步機制
+
+啟用後，專案會自動與中央 repo 保持同步：
+
+| 觸發方式 | 時機 | 行為 |
+|---------|------|------|
+| **GitHub Action** | 每週一凌晨 | 自動建立 PR（不直推主線） |
+| **Git Hook** | 每次 `git pull` | 提示是否有新版本 |
+| **手動** | 隨時 | `bash .github/scripts/sync-ai-standard.sh` |
+
+**專案專屬設定**不會被覆蓋 — 使用 `*.local.md` 檔案（如 `CLAUDE.local.md`）存放專案特有的設定。
 
 ---
 
@@ -119,16 +138,16 @@ cd C:\path\to\your\new-project
 - 新 AI 啟動流程
 
 ## 🧭 工程師實作與交付流程（PR/CI 版）
-- 以 `ai/<工程師>/<任務>` 分支開發，不直接在 `surprise/bootstrap` 上提交。
+- 以 `ai/<工程師>/<任務>` 分支開發，不直接在 `主線分支` 上提交。
 - 每次提交前先補齊需求理解、最小影響檢查，並完成本地 build / 功能 smoke。
 - 每個分支必須先完成 `preview` 自我驗證後再提 PR。
-- 預覽網址規則（`ai/<engineer>/<task>`）：`https://sp-staging.kwanxin.com/p/<engineer>/<task>/`（例如 `ai/jakson/510-fix-api-syntax` 對應 `/p/jakson/510-fix-api-syntax/`）。
+- 預覽網址規則（`ai/<engineer>/<task>`）：`https://<your-staging-domain>/p/<engineer>/<task>/`。
 - 確認項目至少包含登入與授權 API（`/api/auth/me`, `/api/auth/login`）回應正常、目標頁面主流程可載入、主要 API（例如 `GET /api/stock/movements`）不再回 500，以及新增或變更功能可重複操作且不殘留舊快取錯誤。
 - 每次修改完成回報（含中間交付）必須附上「合併前預覽網址」，且只需提供本次修改目標頁（若有指定單號/ID 需附完整路徑）。
 - 除非使用者另外要求，不需主動提供分支入口、列表頁或模組首頁預覽網址。
 - 所有 preview 變更先回報 PM，由 PM 回覆「可上線」後才進入合併流程。
 - PR 建立時務必附上變更摘要、風險、回退方案、影像或截圖證據、測試步驟與結果（包含 smoke/healthcheck）。
-- PR 必須通過 CI（含部署健康檢查）才可合併到 `surprise/bootstrap`。
+- PR 必須通過 CI（含部署健康檢查）才可合併到 `主線分支`。
 - 每次 PR（含更新 commit 後）都必須維持 required checks 全綠；任一檢查非綠燈時，禁止宣告完成、禁止請求合併。
   - required checks 只接受 `success`；`expected`/`pending`/`neutral`/`skipped`/`cancelled` 均視為未通過。
   - PR 必須無衝突且可合併（若顯示 `Checks awaiting conflict resolution` 則先解衝突）。

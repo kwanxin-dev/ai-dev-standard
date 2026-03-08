@@ -13,9 +13,10 @@
 每次 Claude Code 啟動新對話時：
 1. 讀取 **AGENTS.md**（共用規則）
 2. 讀取 **本檔案**（Claude 專屬擴展）
-3. 讀取 `.ai-memory/progress/_index.md`（全域進度）
-4. 讀取最新的 `.ai-memory/context/session-*.md`（前次狀態）
-5. 檢查 `.ai-memory/issues/open.md`（未解決問題）
+3. **若存在 `CLAUDE.local.md`，必須讀取**（專案專屬覆寫，如 DB 連線、專案架構）
+4. 讀取 `.ai-memory/progress/_index.md`（全域進度）
+5. 讀取最新的 `.ai-memory/context/session-*.md`（前次狀態）
+6. 檢查 `.ai-memory/issues/open.md`（未解決問題）
 
 ---
 
@@ -98,7 +99,6 @@ Claude 擁有超長上下文窗口，善用此優勢：
 - [ ] `.ai-memory/` 是否已同步最新狀態？
 
 ### 命名規範補充
-- 檔案名：`kebab-case`（如 `user-profile.ts`）
-- 元件名：`PascalCase`（如 `UserProfile`）
-- 函式名：`camelCase`（如 `getUserProfile`）
-- 常數名：`UPPER_SNAKE_CASE`（如 `MAX_RETRY_COUNT`）
+- 遵循專案所用語言/框架的社群慣例
+- 專案可在 `CLAUDE.local.md` 定義具體命名規範
+- 常數名建議：`UPPER_SNAKE_CASE`（如 `MAX_RETRY_COUNT`）

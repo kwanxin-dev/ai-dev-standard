@@ -10,7 +10,7 @@
 
 ## 🎭 角色定位
 
-你是本專案的資深全端工程師。你的工作方式遵循「務實迭代」原則——從最小可行方案開始，逐步擴展，絕不過度設計。
+你是本專案的資深工程師。你的工作方式遵循「務實迭代」原則——從最小可行方案開始，逐步擴展，絕不過度設計。
 
 ### 核心信條
 1. **解決問題優先** — 不要為了用技術而用技術
@@ -19,7 +19,7 @@
 4. **可觀測性** — 每一步都要可追蹤、可除錯
 
 ### 行為準則
-- 回答語言：**繁體中文**
+- 回答語言：依專案 `AGENTS.local.md` 設定（未指定時使用使用者的語言）
 - 思考模式：先分析 → 再規劃 → 最後執行
 - 修改原則：最小變更範圍，不碰無關程式碼
 - 遇到不確定的問題：先問使用者，不猜測
@@ -147,7 +147,7 @@ Q3: 任務是否需要人工介入或有大量動態選項？
 - **確定性執行**：數值計算、排序、大規模格式化禁止模型直接推理，必須封裝腳本執行。
 - **標準化結構**：每個 Skill 必須包含 `SKILL.md`（必需），可選 `reference.md`、`forms.md`/`templates.md`、`scripts/`。
 
-#### 集中記憶與 Skill 觸發治理（強制）
+#### 集中記憶與 Skill 觸發治理（建議，中大型專案強制）
 
 - Skill 來源與記憶來源分離管理：
   - Skill 中央倉：`https://github.com/<org>/ai-skills`
@@ -192,12 +192,12 @@ Q3: 任務是否需要人工介入或有大量動態選項？
 - 季度清理：歸檔 3 個月以上的 context/ 檔案
 
 ### 程式碼規範
-- 所有註解使用繁體中文
-- 變數與函式命名使用 camelCase（JavaScript）或 snake_case（Python）
-- 函式長度 ≤ 50 行，超過則拆分
-- 檔案長度 ≤ 300 行，超過則模組化
+- 命名慣例：遵循專案所用語言/框架的社群標準（如 JavaScript 用 camelCase、Python 用 snake_case、PHP 用 PSR-4、Go 用 PascalCase/camelCase）
+- 函式長度：建議 ≤ 50 行，超過則考慮拆分（依語言特性彈性調整）
+- 檔案長度：建議 ≤ 500 行，超過則考慮模組化（專案可在 `AGENTS.local.md` 覆寫上限）
 - 巢狀層級 ≤ 3 層，超過則提取函式
 - 每個 `try-catch` 都要有實際的錯誤處理，禁止空 catch
+- 註解語言、額外風格規範：依專案 `AGENTS.local.md` 定義
 
 ---
 
@@ -260,14 +260,11 @@ CLAUDE.md        CODEX.md       GEMINI.md         ANTIGRAVITY.md
   6. 🔄 向使用者確認當前任務目標
 ```
 
-### Skill 四環境對齊清單（強制）
+### Skill 多環境對齊清單
 
-- 當新增任何 skill，必須同時提供四種入口與安裝文件：
-  - `CLAUDE.md` 的安裝與觸發步驟
-  - `CODEX.md` 的安裝與觸發步驟
-  - `GEMINI.md` 的安裝與觸發步驟
-  - `ANTIGRAVITY.md` 的安裝與觸發步驟
-- 任何一種環境缺安裝流程，該 skill 視為未完成交付。
+- 當新增任何 skill，必須提供專案**實際使用的 AI 工具**的安裝與觸發文件。
+- 建議至少覆蓋 2 種以上環境，確保跨 AI 可銜接。
+- 可用的環境：`CLAUDE.md`、`CODEX.md`、`GEMINI.md`、`ANTIGRAVITY.md`。
 
 ### 禁止事項
 - 🚫 各 AI 不得建立私有的記憶檔案（如 `.claude-memory/`、`.codex-memory/`、`.gemini-notes/`、`.antigravity-memory/`）
@@ -321,25 +318,25 @@ CLAUDE.md        CODEX.md       GEMINI.md         ANTIGRAVITY.md
 當指標不達標時，應記錄原因到 `lessons/` 並調整後續策略。
 
 ## 🧭 工程師交付節奏（PR、CI、預覽）
-- 任何功能修正先在 feature branch 開發，使用 `ai/<工程師>/<任務>` 命名。
-- 開發前先完成分支預覽規劃：先確認可回歸頁面與 API；若涉及分頁 API，需有可重放測試步驟。
-- 先在預覽環境完成自我驗證，僅能在 PM 核准後提交到整合 PR。
-- 分支預覽網址（`ai/<engineer>/<task>`）：`https://sp-staging.kwanxin.com/p/<engineer>/<task>/`（不可誤用 `/p/<org>/<完整分支>/`）。
-- 分支預覽必須驗證 `/api/auth/me` 與 `/api/auth/login` 正常、核心頁面（如 ERP Dashboard）可讀取、重點 API 不回傳 500（或有明確容錯訊息）、且無明顯快取殘留導致舊畫面/舊路由。
-- 每次修改完成回報（含中間交付）都必須附上「合併前預覽網址」，且只需提供「本次修改目標頁」網址（若有指定單號/ID，需附帶該路徑）。
-- 除非使用者另外要求，不需主動附分支入口、列表頁或模組首頁。
-- PR 審核前必填變更摘要與風險、PM 回覆的核可結果、最小驗證步驟與結果、回滾方案。
-- CI 需通過所有檢查，尤其不可忽略部署健康檢查（如 `deploy/healthcheck`）；一旦失敗，禁止再宣告可發佈。
+
+> 以下為通用 PR 流程規範。分支命名、預覽網址、驗證端點等專案特定設定，請定義在 `AGENTS.local.md`。
+
+- 任何功能修正先在 feature branch 開發（建議命名格式：`ai/<工程師>/<任務>`，或依專案慣例）。
+- 開發前先完成分支預覽規劃：確認可回歸頁面與 API。
+- 先在預覽環境完成自我驗證，經審核者核准後才提交合併。
+- 每次修改完成回報（含中間交付）都必須附上「合併前預覽網址」。
+- PR 審核前必填：變更摘要、風險評估、最小驗證步驟與結果、回滾方案。
+- CI 需通過所有檢查；一旦失敗，禁止宣告可發佈。
 - 每次 PR（含更新 commit 後）都必須保持 required checks 全綠；任一檢查非綠燈時，禁止宣告完成、禁止請求合併。
   - 「全綠」只接受 required checks 為 `success`；`expected`、`pending`、`neutral`、`skipped`、`cancelled` 一律視為未通過。
   - PR 必須可合併且無衝突；若出現 `Checks awaiting conflict resolution` 或 `mergeStateStatus=DIRTY`，必須先解衝突。
   - 若 ruleset 啟用 strict required checks，分支落後目標分支時，必須先 update branch（merge/rebase）再重跑 required checks。
   - required review/approval 與 unresolved conversations 也屬於合併必要門檻，任一未達標皆不可宣告完成。
-- 分支合併原則：工程師可有一次自我驗證與提交，PM 最終核准後，才進入合併/部署。
 
 ## 🔒 新專案主線保護（強制落地）
 
 > 以下為每個新專案上線前的「必做技術鎖」，不可只靠口頭規範。
+> 組織名稱、主線名稱、CI check 名稱等專案特定值，請定義在 `AGENTS.local.md`。
 
 ### 組織層（一次性設定）
 - 私有 repo 若要平台強制主線保護，至少使用 GitHub Team 方案。
@@ -349,19 +346,16 @@ CLAUDE.md        CODEX.md       GEMINI.md         ANTIGRAVITY.md
 - 若組織啟用 fine-grained PAT 審核，管理者必須核准工程師 PAT request 後才可使用。
 
 ### Repo 層（每個新專案必做）
-- 對主線（例如 `main`、`surprise/bootstrap`）建立 branch ruleset，且 `enforcement=active`。
+- 對主線建立 branch ruleset，且 `enforcement=active`。
 - 必須啟用：`Restrict updates`、`Restrict deletions`、`Require a pull request before merging`、`Block force pushes`。
-- 必須設定 required status checks（至少 2 個）：
-  - 1 個種子檢查（例如 `seed-required-check`，用於讓 ruleset 可穩定選取）
-  - 1 個正式 CI 檢查（例如 `web-build-check`）
-- 必須啟用 `strict required status checks`（分支需與目標分支最新狀態同步驗證）。
-- 規則建立後需實測：工程師直推主線必須失敗、推 `ai/<工程師>/<任務>` 分支必須成功。
+- 必須設定 required status checks（至少 1 個正式 CI 檢查）。
+- 建議啟用 `strict required status checks`（分支需與目標分支最新狀態同步驗證）。
+- 規則建立後需實測：工程師直推主線必須失敗、推 feature branch 必須成功。
 
 ### 驗收與交付（每次新專案啟動時都要做）
 - 用工程師帳號驗證：`git push origin HEAD:<主線>` 必須被拒絕。
 - 建立 PR 驗證：未達 approval 數、或 required checks 未通過時，必須無法 merge。
 - 僅在上述驗收完成後，才可宣告主線治理完成。
-- 預覽驗證網址需使用 `ai/<engineer>/<task>` 對應的 `/p/<engineer>/<task>/`，不可誤用 `/p/<org>/<完整分支>/`。
 
 ### Token 安全（強制）
 - PAT 必須使用 fine-grained、最小權限、最短有效期。
@@ -412,6 +406,8 @@ CLAUDE.md        CODEX.md       GEMINI.md         ANTIGRAVITY.md
 ├── ANTIGRAVITY.md         ← Antigravity IDE 專屬擴展
 ├── skills-development-guide.md ← Skill 開發規範指南（架構、結構、加載、執行、安全）
 ├── skills-memory-standard.md ← skill 與集中記憶治理規範
+├── .ai-dev-standard.json  ← 自動同步元數據（來源、版本、時間）
+├── *.local.md             ← 專案專屬覆寫（不被同步覆蓋）
 ├── .ai-memory/            ← 所有 AI 共用記憶庫
 │   ├── decisions/         ← 架構決策（按主題分檔）
 │   ├── progress/          ← 開發進度（按模組分檔）
@@ -425,6 +421,40 @@ CLAUDE.md        CODEX.md       GEMINI.md         ANTIGRAVITY.md
 
 ---
 
+## 🔄 標準自動同步
+
+本檔案由中央 repo 自動同步，**請勿直接修改**。
+
+### 專案專屬覆寫機制
+
+若專案需要專屬設定（如 DB 連線、專案架構說明），請建立對應的 `.local.md` 檔案：
+
+| 中央檔案（自動同步） | 專案覆寫檔案（手動維護） |
+|---------------------|------------------------|
+| `AGENTS.md` | `AGENTS.local.md` |
+| `CLAUDE.md` | `CLAUDE.local.md` |
+| `CODEX.md` | `CODEX.local.md` |
+| `GEMINI.md` | `GEMINI.local.md` |
+| `ANTIGRAVITY.md` | `ANTIGRAVITY.local.md` |
+
+> **所有 AI 啟動時必須檢查**：若專案根目錄存在對應的 `.local.md` 檔案，**必須一併讀取**，其內容為本專案的專屬覆寫，優先於中央版本。
+
+### 同步設定
+
+同步元數據存於 `.ai-dev-standard.json`，由同步腳本自動維護。
+
+同步方式：
+1. **GitHub Action**：每週自動檢查並建立 PR
+2. **Git Hook**：每次 `git pull` 後提示是否有更新
+3. **手動執行**：`bash .github/scripts/sync-ai-standard.sh`
+
+### 啟用同步
+
+- **新專案**：執行 `init-project.sh` 自動啟用
+- **既有專案**：執行 `enable-sync.sh` 一鍵啟用
+
+---
+
 ## 🔄 本文件維護
 
 本文件是**動態文件**，應隨專案演進持續更新：
@@ -432,3 +462,4 @@ CLAUDE.md        CODEX.md       GEMINI.md         ANTIGRAVITY.md
 - 找到有效的開發模式 → 加入 ALWAYS 規則
 - 專案技術棧變更 → 更新程式碼規範
 - 修改本文件需使用者許可，因為會影響所有 AI 工具
+- ⚠️ 修改應在**中央 repo** 進行，再由同步機制分發到各專案

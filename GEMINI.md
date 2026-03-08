@@ -85,21 +85,21 @@ Gemini 支援理解圖片、影片、音檔，善用此能力：
 
 Gemini 對工具描述格式特別敏感，使用 YAML 模板：
 ```yaml
-tool_name: search_products
+tool_name: search_items
 description: |
-  在產品資料庫中搜尋符合條件的產品。
+  在資料庫中搜尋符合條件的項目。
   支援模糊搜尋和精確匹配。
 parameters:
   keyword:
     type: string
     required: true
-    description: 搜尋關鍵字（支援中文模糊搜尋）
-    example: "巧克力蛋糕"
+    description: 搜尋關鍵字
+    example: "example-keyword"
   category:
     type: string
     required: false
-    description: 產品類別篩選
-    enum: [糕點, 飲品, 禮盒, 原物料]
+    description: 類別篩選
+    enum: [category_a, category_b, category_c]
   max_results:
     type: integer
     required: false
@@ -108,18 +108,17 @@ parameters:
 returns:
   type: array
   items:
-    - id: 產品編號
-    - name: 產品名稱
-    - price: 售價
-    - stock: 庫存數量
+    - id: 項目編號
+    - name: 項目名稱
+    - status: 狀態
 errors:
   - code: NO_RESULTS
-    description: 找不到符合條件的產品
+    description: 找不到符合條件的項目
   - code: INVALID_CATEGORY
     description: 類別名稱不在允許範圍內
 usage_scenario: |
-  當使用者要查詢產品資訊、比較價格、確認庫存時使用。
-  不適用於修改產品資料（請改用 update_product）。
+  當使用者要查詢項目資訊時使用。
+  不適用於修改項目資料（請改用 update_item）。
 ```
 
 #### 工具管理補充

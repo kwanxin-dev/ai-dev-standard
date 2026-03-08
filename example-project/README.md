@@ -60,11 +60,11 @@ powershell -File ..\Agent指南\init-project.ps1
 ## 佈署與核可節奏（建議）
 
 1. 工程師在 `ai/<工程師>/<任務>` 分支完成實作與本地驗證。
-2. push 後以 `https://sp-staging.kwanxin.com/p/<engineer>/<task>/` 進行分支預覽自我驗證（不可誤用 `/p/<org>/<完整分支>/`）。
+2. push 後以 `https://<your-staging-domain>/p/<engineer>/<task>/` 進行分支預覽自我驗證。
 3. 每次修改完成回報（含中間交付）必須附上「合併前預覽網址」，且只需提供本次修改目標頁（若有指定單號/ID 需附完整路徑）。
 4. 驗證項目至少包含登入流程、主頁進入、目標 API 回應與基本流程可操作。
 5. 將驗證截圖與結果回報 PM，由 PM 給最終「可上線」判定。
-6. 通過後提 PR 到 `surprise/bootstrap`，並要求 CI 完全通過（含 `/api` 健檢與 healthcheck）。
+6. 通過後提 PR 到 主線分支，並要求 CI 完全通過（含 `/api` 健檢與 healthcheck）。
 7. PR 建立後每次更新 commit 都要確認 required checks 全綠；任一檢查非綠燈時，禁止宣告完成或請求合併。
    - required checks 只接受 `success`；`expected`/`pending`/`neutral`/`skipped`/`cancelled` 都視為未通過。
    - PR 必須無衝突且可合併（若顯示 `Checks awaiting conflict resolution`，先解衝突）。

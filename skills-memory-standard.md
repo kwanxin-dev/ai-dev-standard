@@ -107,9 +107,12 @@ bash scripts/install-skill.sh \
 - 每次任務結束：
   - 執行 `append-event.sh` 寫入成功或失敗案例。
   - 執行 `sync-hub.sh` 將事件同步到 `ai-memory-hub`。
+  - `sync-hub.sh` 建立 PR 後，預設必須自動 merge；若只在 `projects/<owner>/<repo>/state/cases/index.json` 衝突，先同步最新 `main`、重建 index、推回分支後再 merge。
+  - 只有 PR 已 merged 才算記憶同步完成。
 
 ## 9. 驗收條件
 
 - 新增一個 skill 時，四環境都要有安裝步驟與觸發說明。
 - `ai-memory-hub` 可查到同一任務的完整歷史（包含失敗與成功）。
 - 隨機抽查事件不得被覆寫（append-only 生效）。
+- `ai-memory-hub` 的同步 PR 預設會自動合併；若 case index 衝突，流程能更新分支並完成 merge。

@@ -22,6 +22,7 @@
 ### Skill 優先觸發
 - 有對應 skill 時，優先走 skill 腳本，不依賴手動提示詞。
 - 任務完成後，必須回寫成功/失敗案例到 `ai-memory-hub`。
+- `ai-memory-hub` PR 建立後預設要自動 merge；若只在 `state/cases/index.json` 衝突，先更新分支並重建 index 再 merge。
 
 ### 變更策略
 - 優先採用最小變更，避免同時改動不相干模組。
@@ -37,4 +38,4 @@
 
 - [ ] 任務前已執行 preflight
 - [ ] 任務後已追加事件（success 或 failed）
-- [ ] 事件已同步到 `ai-memory-hub`
+- [ ] 事件已同步到 `ai-memory-hub` 且 PR 已 merged

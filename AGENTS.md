@@ -153,6 +153,8 @@ Q3: 任務是否需要人工介入或有大量動態選項？
   - Skill 中央倉：`https://github.com/<org>/ai-skills`
   - Memory 中央倉：`https://github.com/<org>/ai-memory-hub`
 - 每個專案保留本地 `.ai-memory/` 作為工作快取，但最終記錄需同步到 `ai-memory-hub`。
+- `ai-memory-hub` 的同步分支建立 PR 後，預設必須自動合併；只有 PR 已 `merged` 才算同步完成。
+- 若衝突只發生在 `projects/<owner>/<repo>/state/cases/index.json`，先同步最新 `main`、重建 case index、推回分支後再完成 merge。
 - 記憶紀錄必須採 **append-only**：
   - 允許新增新事件
   - 禁止直接改寫既有事件內容

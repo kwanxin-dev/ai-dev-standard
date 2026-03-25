@@ -28,6 +28,7 @@
   bash scripts/install-skill.sh --skill memory-hub-sync --targets claude,codex,gemini,antigravity
   ```
 - 任務開始先跑 preflight（先讀歷史），任務結束追加事件並同步到 `ai-memory-hub`。
+- `ai-memory-hub` PR 建立後預設要自動 merge；若只在 `state/cases/index.json` 衝突，先更新分支並重建 index 再 merge。
 - 詳細治理規格請參考 `skills-memory-standard.md`。
 
 ---

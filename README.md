@@ -28,6 +28,7 @@
 ├── ANTIGRAVITY.md                     ← Antigravity IDE 專屬擴展
 ├── skills-development-guide.md         ← Skill 開發規範指南（架構/結構/加載/執行/安全）
 ├── skills-memory-standard.md          ← Skill + ai-memory-hub 治理標準草案
+├── cicd-standard.md                   ← CI/CD 持續整合與自動部署規範
 ├── 新專案開發流程規範.html              ← 開發流程規範（HTML 視覺化版）
 ├── github-project-lifecycle-sop.md    ← GitHub 權限/PR/合併完整 SOP（實戰版）
 ├── 為什麼這樣規劃_設計理念說明.html      ← 規則設計理念與背景知識
@@ -54,6 +55,7 @@ CLAUDE.md        CODEX.md       GEMINI.md         ANTIGRAVITY.md
 | **ANTIGRAVITY.md** | 擴展 | IDE 任務啟動檢查、Skill 安裝檢核、記憶追溯要求 |
 | **skills-development-guide.md** | 開發規範 | Skill 架構理念、資料夾結構、漸進式加載(L1→L2→L3)、確定性執行、跨工具映射、安全治理 |
 | **skills-memory-standard.md** | 治理 | Skill 中央倉 + 記憶中央倉、append-only、成功/失敗案例記錄 |
+| **cicd-standard.md** | CI/CD | SSH Key 部署、rsync 排除規則、三階段驗證、回滾策略、Secrets 管理 |
 
 ---
 

@@ -22,19 +22,22 @@
 
 ```
 .github/workflows/
-├── deploy.yml              # 生產環境部署
+├── deploy-main.yml         # 生產環境部署（push to main）
+├── deploy-preview.yml      # PR 預覽部署（自動產生預覽網址）
+├── pr-ci.yml               # PR 持續整合（lint/test）
 ├── deploy-staging.yml      # 測試環境部署（如有）
 ├── sync-ai-standard.yml    # AI 標準同步（由 enable-sync.sh 安裝）
-└── ci.yml                  # 持續整合（lint/test，如有）
+└── ci.yml                  # 其他持續整合（如有）
 ```
 
 ### 觸發條件
 
 | Workflow | 觸發 | 說明 |
 |----------|------|------|
-| `deploy.yml` | push to `main` + `workflow_dispatch` | 只有合併到主分支才部署 |
+| `deploy-main.yml` | push to `main` + `workflow_dispatch` | 只有合併到主分支才部署 |
+| `deploy-preview.yml` | pull_request (opened/synchronize/reopened/closed) | PR 預覽，合併前可先確認 |
+| `pr-ci.yml` | pull_request to `main` | PR 時自動檢查（lint/test） |
 | `deploy-staging.yml` | push to `develop` | 測試環境跟隨開發分支 |
-| `ci.yml` | pull_request to `main` | PR 時自動檢查 |
 
 ### paths-ignore（部署時排除）
 
@@ -212,6 +215,159 @@ concurrency:
 
 ---
 
+## PR 預覽部署
+
+### 設計目的
+
+每個 PR 自動產生獨立的預覽網址，讓審查者在合併前確認變更效果。
+預覽在 PR 關閉後自動清理，不留殘檔。
+
+### 流程
+
+```
+PR 開啟/更新 → deploy-preview.yml 觸發
+    ↓
+部署到 /preview/pr-{N}/
+    ↓
+自動在 PR 留言貼上預覽網址
+    ↓
+審查者確認 → 合併
+    ↓
+PR 關閉 → 自動清理預覽目錄
+```
+
+### 預覽網址格式
+
+```
+http://<host>/preview/pr-<number>/
+```
+
+例如：PR #56 → `http://210.60.194.33/preview/pr-56/`
+
+### Workflow 模板（self-hosted runner）
+
+```yaml
+name: Deploy Preview on PR
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, closed]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: preview-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  deploy-preview:
+    if: github.event.action != 'closed'
+    runs-on: [self-hosted, <runner-label>]
+    steps:
+      - name: Deploy PR branch to preview path
+        id: deploy
+        shell: bash
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}.git
+        run: |
+          set -euo pipefail
+          preview_root="/var/www/html/preview"
+          target_dir="${preview_root}/pr-${PR_NUMBER}"
+          mkdir -p "${preview_root}"
+
+          if [ -d "${target_dir}/.git" ]; then
+            git -C "${target_dir}" fetch --prune origin "${HEAD_REF}"
+          else
+            rm -rf "${target_dir}"
+            git clone "${REPO_URL}" "${target_dir}"
+          fi
+
+          git -C "${target_dir}" checkout -B "${HEAD_REF}" "origin/${HEAD_REF}"
+          git -C "${target_dir}" reset --hard "${HEAD_SHA}"
+
+          # 如有 composer.json，安裝依賴
+          if [ -f "${target_dir}/composer.json" ]; then
+            composer install --working-dir="${target_dir}" \
+              --no-interaction --prefer-dist --no-progress || true
+          fi
+
+          echo "preview_url=http://<host>/preview/pr-${PR_NUMBER}/" >> "$GITHUB_OUTPUT"
+
+      - name: Comment preview URL on PR
+        uses: actions/github-script@v7
+        env:
+          PREVIEW_URL: ${{ steps.deploy.outputs.preview_url }}
+        with:
+          script: |
+            const marker = '<!-- preview-deploy-url -->'
+            const body = `${marker}\n✅ Preview 部署完成\n- URL: ${process.env.PREVIEW_URL}\n- Commit: \`${context.payload.pull_request.head.sha.slice(0,7)}\``
+            const { owner, repo } = context.repo
+            const issue_number = context.issue.number
+            const comments = await github.paginate(
+              github.rest.issues.listComments, { owner, repo, issue_number, per_page: 100 }
+            )
+            const existing = comments.find(c => c.body?.includes(marker))
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body })
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body })
+            }
+
+  cleanup-preview:
+    if: github.event.action == 'closed'
+    runs-on: [self-hosted, <runner-label>]
+    steps:
+      - name: Remove preview directory
+        run: rm -rf "/var/www/html/preview/pr-${{ github.event.pull_request.number }}"
+
+      - name: Comment cleanup
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: '<!-- preview-deploy-url -->\n🧹 Preview 已清理（PR 已關閉）'
+            })
+```
+
+### 關鍵設計
+
+| 要點 | 說明 |
+|------|------|
+| **PR 留言更新** | 同一 PR 多次 push 時，更新既有留言而非重複留言（用 HTML marker 辨識） |
+| **並行隔離** | 每個 PR 獨立目錄 `/preview/pr-{N}/`，互不干擾 |
+| **自動清理** | PR 關閉（合併或取消）時自動刪除預覽目錄 |
+| **concurrency** | `cancel-in-progress: true` — 同一 PR 的新 push 會取消前一次預覽部署 |
+
+### 生產部署 rsync 排除預覽目錄
+
+生產部署的 rsync 必須排除 `preview/`，否則會被 `--delete` 清除：
+
+```yaml
+rsync -av --delete \
+  --exclude='preview/' \
+  ...
+```
+
+### Variables 設定（可選）
+
+| Variable | 用途 | 預設值 |
+|----------|------|--------|
+| `PREVIEW_BASE_URL` | 預覽網址前綴 | `http://<host>/preview` |
+| `PREVIEW_ROOT` | 預覽目錄路徑 | `/var/www/html/preview` |
+
+設定方式：GitHub Repo Settings → Variables（非 Secrets，不含敏感資訊）
+
+---
+
 ## 回滾策略
 
 ### 快速回滾（推薦）
@@ -271,8 +427,11 @@ sudo systemctl reload apache2
 - [ ] 公鑰加到目標主機 (`~/.ssh/authorized_keys`)
 - [ ] 私鑰加到 GitHub Secrets (`SSH_PRIVATE_KEY`)
 - [ ] 設定其他 Secrets (`SSH_HOST`, `SSH_USER`, `DEPLOY_PATH`)
-- [ ] 複製 `.github/workflows/deploy.yml` 模板
-- [ ] 調整 rsync 排除規則（依專案需求）
-- [ ] 測試部署（`workflow_dispatch` 手動觸發）
+- [ ] 複製 `.github/workflows/deploy-main.yml` 模板
+- [ ] 複製 `.github/workflows/deploy-preview.yml` 模板
+- [ ] 複製 `.github/workflows/pr-ci.yml` 模板（如需 lint/test）
+- [ ] 調整 rsync 排除規則（依專案需求，含 `--exclude='preview/'`）
+- [ ] 測試生產部署（`workflow_dispatch` 手動觸發）
+- [ ] 測試 PR 預覽（建立測試 PR 確認預覽網址正常）
 - [ ] 確認回滾流程可行
 - [ ] 清除本地 SSH 私鑰

@@ -83,6 +83,7 @@ while IFS= read -r filename; do
   HTTP_CODE=$(curl -sL -w "%{http_code}" ${AUTH_HEADER} -o "/tmp/_ai_std_${filename//\//_}" "$URL")
 
   if [[ "$HTTP_CODE" == "200" ]]; then
+    mkdir -p "$(dirname "$filename")"
     cp "/tmp/_ai_std_${filename//\//_}" "$filename"
     echo "  ✅ ${filename}"
     DOWNLOAD_COUNT=$((DOWNLOAD_COUNT + 1))

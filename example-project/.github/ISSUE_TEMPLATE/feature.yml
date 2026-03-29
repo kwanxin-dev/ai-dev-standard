@@ -1,0 +1,55 @@
+name: Feature / Change Request
+description: 規劃新功能、重大修補或跨模組變更
+title: "[feature] "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        請先確認這不是 trivial 修正。凡是會跨 PR、跨工作日、影響 release / staging / 驗收，或改動多模組的工作，必須指定 milestone。
+  - type: input
+    id: summary
+    attributes:
+      label: 一句話問題定義
+      description: 這個功能或變更要解決什麼問題？
+      placeholder: 例如：讓 packaged runtime 在 WSL 啟動時自動檢查更新
+    validations:
+      required: true
+  - type: textarea
+    id: deliverable
+    attributes:
+      label: 預期交付結果
+      description: 交付完成後，使用者或系統應得到什麼具體結果？
+      placeholder: 列出可觀察的完成結果
+    validations:
+      required: true
+  - type: input
+    id: milestone
+    attributes:
+      label: Milestone
+      description: 請填入既有 milestone 名稱；若尚未建立，先建立後再提交 issue。trivial 例外請填 `trivial-exception`。
+      placeholder: 例如：v0.4.0 / Phase 1 - MVP / 2026-04 Runtime Hardening
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: 範圍與邊界
+      description: 請列出這次要做與明確不做的內容，避免 AI 或工程師擴張範圍。
+      placeholder: |
+        要做：
+        - ...
+
+        不做：
+        - ...
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: 驗證方式
+      description: 這個工作完成後，要用什麼方式驗證？
+      placeholder: 例如：CI、preview、doctor、smoke test、人工驗收
+    validations:
+      required: true

@@ -34,6 +34,8 @@
 ├── 為什麼這樣規劃_設計理念說明.html      ← 規則設計理念與背景知識
 ├── init-project.sh                    ← 一鍵初始化腳本（Linux/Mac）
 ├── init-project.ps1                   ← 一鍵初始化腳本（Windows）
+├── .github/ISSUE_TEMPLATE/            ← GitHub issue 模板（含 milestone 欄位）
+├── .github/PULL_REQUEST_TEMPLATE.md   ← GitHub PR 模板（強制交付欄位）
 └── example-project/                   ← 範例專案模板（可直接複製使用）
 ```
 
@@ -80,6 +82,7 @@ cd C:\path\to\your\new-project
 ```
 
 腳本會自動建立：`.ai-memory/` 目錄結構、`.github/workflows/ci.yml`、`CODEOWNERS`、`.gitignore`，並**自動下載 AI 開發標準檔案 + 啟用自動同步**。
+同時也會建立 GitHub `issue` / `PR` 模板，讓 milestone、驗證方式、風險與回退方案變成表單級要求，而不是口頭提醒。
 
 ### 方法 3：既有專案啟用自動同步
 

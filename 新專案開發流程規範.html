@@ -523,8 +523,9 @@
                     </div>
                     <div class="flow-content">
                         <strong>工程師從 Issue Board 領任務</strong>
-                        <div style="color:var(--text-muted);font-size:0.85rem">開 <code>feature/issue-編號-簡述</code> branch
-                            開發</div>
+                        <div style="color:var(--text-muted);font-size:0.85rem">
+                            先確認 Issue 已掛到正確 Milestone，再開 <code>feature/issue-編號-簡述</code> branch 開發
+                        </div>
                     </div>
                 </div>
                 <div class="flow-step">
@@ -534,6 +535,9 @@
                     </div>
                     <div class="flow-content">
                         <strong>Push → 自動建立 PR</strong>
+                        <div style="color:var(--text-muted);font-size:0.85rem">
+                            PR 必須能對應 Issue / Milestone，且不能脫離該批交付範圍
+                        </div>
                     </div>
                 </div>
                 <div class="flow-step">
@@ -597,6 +601,14 @@
                 <tr>
                     <td>設定 PR 規則</td>
                     <td>至少 1 人 approve（老闆）+ CI 必須通過</td>
+                </tr>
+                <tr>
+                    <td>建立 Milestone 策略</td>
+                    <td>把 GitHub Milestone 當成交付批次，而不是分類標籤；凡是非 trivial 工作原則上都要掛 milestone</td>
+                </tr>
+                <tr>
+                    <td>建立 Issue / PR 模板</td>
+                    <td>模板必須要求填寫 milestone、驗證方式、風險與回退方案</td>
                 </tr>
                 <tr>
                     <td>設定 CODEOWNERS</td>
@@ -800,6 +812,9 @@ PR #43 → https://pr-43.preview.example.com</pre>
                     <td>main + develop</td>
                 </tr>
             </table>
+            <div class="alert info" style="margin-top:1rem">
+                Issue 是正式工作單位，Milestone 是交付批次，PR 是審查與實作載體。labels 只負責分類，不取代 milestone。
+            </div>
         </div>
 
         <!-- 五、衝突預防 -->

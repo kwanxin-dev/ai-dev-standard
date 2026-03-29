@@ -60,6 +60,9 @@ jobs:
           git checkout -b "$BRANCH"
           git add AGENTS.md CLAUDE.md CODEX.md GEMINI.md ANTIGRAVITY.md \
                   skills-development-guide.md skills-memory-standard.md \
+                  .github/ISSUE_TEMPLATE/feature.yml \
+                  .github/ISSUE_TEMPLATE/bug.yml \
+                  .github/PULL_REQUEST_TEMPLATE.md \
                   .ai-dev-standard.json
           git commit -m "chore: sync AI dev standard from central repo"
           git push -u origin "$BRANCH"

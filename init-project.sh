@@ -115,6 +115,7 @@ echo "  ✅ .ai-memory/ 目錄建立完成"
 # --- 2. 建立 GitHub Actions CI ---
 echo "📦 建立 CI/CD Pipeline..."
 mkdir -p .github/workflows
+mkdir -p .github/ISSUE_TEMPLATE
 
 cat > .github/workflows/ci.yml << 'EOF'
 name: CI
@@ -139,6 +140,123 @@ jobs:
 EOF
 
 echo "  ✅ .github/workflows/ci.yml 建立完成"
+
+# --- 2-1. 建立 GitHub Issue / PR 模板 ---
+echo "🧾 建立 GitHub issue / PR 模板..."
+
+cat > .github/ISSUE_TEMPLATE/feature.yml << 'EOF'
+name: Feature / Change Request
+description: 規劃新功能、重大修補或跨模組變更
+title: "[feature] "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        請先確認這不是 trivial 修正。凡是會跨 PR、跨工作日、影響 release / staging / 驗收，或改動多模組的工作，必須指定 milestone。
+  - type: input
+    id: summary
+    attributes:
+      label: 一句話問題定義
+      description: 這個功能或變更要解決什麼問題？
+    validations:
+      required: true
+  - type: input
+    id: milestone
+    attributes:
+      label: Milestone
+      description: 請填入既有 milestone 名稱；trivial 例外請填 `trivial-exception`。
+      placeholder: 例如：v0.4.0 / Phase 1 - MVP
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: 範圍與邊界
+      description: 請列出這次要做與明確不做的內容。
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: 驗證方式
+      description: 這個工作完成後，要用什麼方式驗證？
+    validations:
+      required: true
+EOF
+
+cat > .github/ISSUE_TEMPLATE/bug.yml << 'EOF'
+name: Bug Report
+description: 回報功能異常、回歸問題或交付缺陷
+title: "[bug] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        若此問題會影響 release、staging、驗收，或需要跨多次修補，必須指定 milestone。只有非常小的單點修正可視為 trivial 例外。
+  - type: input
+    id: problem
+    attributes:
+      label: 問題摘要
+      description: 用一句話描述錯誤現象
+    validations:
+      required: true
+  - type: input
+    id: milestone
+    attributes:
+      label: Milestone
+      description: 請填入既有 milestone 名稱；trivial 例外請填 `trivial-exception`。
+      placeholder: 例如：v0.4.0
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 重現步驟
+      description: 請提供最小可重現步驟
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 預期結果 / 實際結果
+    validations:
+      required: true
+EOF
+
+cat > .github/PULL_REQUEST_TEMPLATE.md << 'EOF'
+## Summary
+-
+
+## Issue / Milestone
+- Issue:
+- Milestone:
+- 若未掛 milestone，請說明為何屬於 trivial 例外：
+
+## Scope
+- 本次有做：
+- 本次明確沒做：
+
+## Risk
+-
+
+## Verification
+- [ ] 已附 preview URL 或 fallback artifact 說明
+- [ ] 已列出最小驗證步驟與結果
+- [ ] required checks 全綠後才請求合併
+
+### Evidence
+- Preview / Artifact:
+- CI / Smoke / Healthcheck:
+
+## Rollback
+-
+EOF
+
+echo "  ✅ GitHub issue / PR 模板建立完成"
 
 # --- 3. 建立 CODEOWNERS ---
 echo "👔 建立 CODEOWNERS..."
@@ -201,11 +319,15 @@ AI_STD_FILES=(
   "ANTIGRAVITY.md"
   "skills-development-guide.md"
   "skills-memory-standard.md"
+  ".github/ISSUE_TEMPLATE/feature.yml"
+  ".github/ISSUE_TEMPLATE/bug.yml"
+  ".github/PULL_REQUEST_TEMPLATE.md"
 )
 
 DOWNLOAD_OK=true
 for f in "${AI_STD_FILES[@]}"; do
   URL="https://raw.githubusercontent.com/${AI_STD_REPO}/${AI_STD_REF}/${f}"
+  mkdir -p "$(dirname "$f")"
   HTTP_CODE=$(curl -sL -w "%{http_code}" -o "$f" "$URL")
   if [[ "$HTTP_CODE" == "200" ]]; then
     echo "  ✅ ${f}"

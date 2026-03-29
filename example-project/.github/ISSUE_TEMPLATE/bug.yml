@@ -1,0 +1,57 @@
+name: Bug Report
+description: 回報功能異常、回歸問題或交付缺陷
+title: "[bug] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        若此問題會影響 release、staging、驗收，或需要跨多次修補，必須指定 milestone。只有非常小的單點修正可視為 trivial 例外。
+  - type: input
+    id: problem
+    attributes:
+      label: 問題摘要
+      description: 用一句話描述錯誤現象
+      placeholder: 例如：private release 的 self-update 在乾淨 Ubuntu 24.04 上失敗
+    validations:
+      required: true
+  - type: input
+    id: milestone
+    attributes:
+      label: Milestone
+      description: 請填入既有 milestone 名稱；trivial 例外請填 `trivial-exception`。
+      placeholder: 例如：v0.4.0
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: 影響範圍
+      description: 說明對使用者、環境或交付的影響
+      placeholder: 例如：阻塞 packaged install、阻塞驗收、只影響測試環境
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 重現步驟
+      description: 請提供最小可重現步驟
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 預期結果 / 實際結果
+      placeholder: |
+        預期：
+        - ...
+
+        實際：
+        - ...
+    validations:
+      required: true

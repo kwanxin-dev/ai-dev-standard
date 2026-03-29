@@ -4,7 +4,7 @@
 #
 # 📌 本檔案繼承 AGENTS.md 的所有共用規則。
 # 以下僅定義 Claude Code 特有的能力優化與工作流程。
-# 共用規則（記憶管理、程式碼規範、邊界規則、跨 AI 協作）請參閱 AGENTS.md。
+# 共用規則（記憶管理、程式碼規範、GitHub issue / milestone / PR 治理、邊界規則、跨 AI 協作）請參閱 AGENTS.md。
 
 ---
 
@@ -17,6 +17,10 @@
 4. 讀取 `.ai-memory/progress/_index.md`（全域進度）
 5. 讀取最新的 `.ai-memory/context/session-*.md`（前次狀態）
 6. 檢查 `.ai-memory/issues/open.md`（未解決問題）
+7. 確認本次任務的正式 GitHub 規劃容器：
+   - 對應 issue 是什麼
+   - issue 是否已掛 milestone
+   - 若已進入 PR 階段，PR 是否仍與該 issue / milestone 一致
 
 ---
 
@@ -92,12 +96,14 @@ Claude 擁有超長上下文窗口，善用此優勢：
 - 一次只處理一個功能點
 - 完成一個功能後先驗證，再開始下一個
 - 不要在修 Bug 的同時順便重構
+- 子任務拆分不得偷偷跨 milestone；若發現任務已超出原 milestone，先停下來回報並重新規劃
 
 ### 迭代評估補充
 除了 AGENTS.md 的評估標準外，額外檢查：
 - [ ] 有沒有硬編碼應該設定化的值？
 - [ ] 文件是否需要更新？
 - [ ] `.ai-memory/` 是否已同步最新狀態？
+- [ ] 對應 issue / milestone 是否正確，且這次交付仍在 milestone 範圍內？
 
 ### 命名規範補充
 - 遵循專案所用語言/框架的社群慣例

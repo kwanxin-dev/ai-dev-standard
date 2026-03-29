@@ -51,6 +51,30 @@ Q3: 任務是否需要人工介入或有大量動態選項？
 - [ ] 確認技術選型，不引入不必要的依賴
 - [ ] 預估影響範圍，標記可能受影響的現有檔案
 
+### GitHub 規劃容器（Issues / Milestones / PR）
+
+- GitHub `Issue` 是正式工作單位；GitHub `Milestone` 是交付批次；`PR` 是實作與審查載體。
+- `.ai-memory/issues/` 是 AI 內部記憶與追溯資料，不可取代 GitHub `Issues` / `Milestones` 的正式協作角色。
+- 任何符合以下任一條件的工作，AI 都應要求或主動建議掛入明確 milestone：
+  - 會跨 1 個以上 PR
+  - 會跨工作日或需要多輪 AI / 工程師接手
+  - 會影響 release、staging、驗收、上線判斷
+  - 會改動多個模組、介面或文件
+- 只有 trivial 工作可不掛 milestone，例如純 typo、格式修正、註解修正、明確的一行式 bugfix。
+- milestone 名稱必須代表可交付結果，禁止使用 `misc`、`temp`、`next` 這類模糊名稱。
+- 建議命名格式：
+  - release：`v0.4.0`
+  - phase：`Phase 1 - MVP`
+  - timebox：`2026-04 Runtime Hardening`
+- AI 在開始實作前，必須先回答：
+  - 這個工作屬於哪個 issue？
+  - 這個 issue 屬於哪個 milestone？
+  - 若沒有 milestone，是否應先補建？
+- AI 在進度回報時，不只回報「目前 issue 做到哪裡」，還要回報：
+  - milestone 還剩多少 open issues
+  - 目前主要阻塞與風險
+  - 這次變更是否仍在 milestone 範圍內
+
 ### System Prompt 設計原則
 - 從 **3-5 條規則** 開始，不要一開始就寫長篇大論
 - 每條規則必須是 **可驗證的行為指令**，不是抽象願景
@@ -330,6 +354,9 @@ CLAUDE.md        CODEX.md       GEMINI.md         ANTIGRAVITY.md
 - Canonical preview 必須是專案可重現、可持續的 URL，且應部署在專案自有的 preview/staging host 或受控的隔離路徑；不得把 `ngrok`、`localtunnel`、`localhost.run` 之類臨時 tunnel 當成 merge gate 的正式 preview。
 - 若專案尚未具備穩定 preview，`AGENTS.local.md` 必須明確標示暫行 fallback（例如截圖、artifact、手動 smoke）與對應的追蹤 change / task，不能只口頭宣稱「目前沒有 preview」。
 - 每次修改完成回報（含中間交付）都必須附上「合併前預覽網址」。
+- 任何非 trivial 的 PR，必須能對應到正式 GitHub issue；該 issue 原則上必須屬於明確 milestone。
+- labels 用來標記類型（如 `bug`、`docs`、`incident`），milestone 用來定義交付批次，兩者不可互相替代。
+- 若 issue 尚未掛 milestone，AI 在提交 PR 前必須主動提醒補建或說明為何屬於例外。
 - PR 審核前必填：變更摘要、風險評估、最小驗證步驟與結果、回滾方案。
 - CI 需通過所有檢查；一旦失敗，禁止宣告可發佈。
 - 每次 PR（含更新 commit 後）都必須保持 required checks 全綠；任一檢查非綠燈時，禁止宣告完成、禁止請求合併。
@@ -337,6 +364,7 @@ CLAUDE.md        CODEX.md       GEMINI.md         ANTIGRAVITY.md
   - PR 必須可合併且無衝突；若出現 `Checks awaiting conflict resolution` 或 `mergeStateStatus=DIRTY`，必須先解衝突。
   - 若 ruleset 啟用 strict required checks，分支落後目標分支時，必須先 update branch（merge/rebase）再重跑 required checks。
   - required review/approval 與 unresolved conversations 也屬於合併必要門檻，任一未達標皆不可宣告完成。
+- 若 milestone 尚未達到完成定義，禁止單憑單一 PR 通過就宣告整批交付完成。
 
 ## 🔒 新專案主線保護（強制落地）
 

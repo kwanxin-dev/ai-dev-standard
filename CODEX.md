@@ -3,7 +3,7 @@
 # 版本：1.0
 #
 # 📌 本檔案繼承 AGENTS.md 的所有共用規則。
-# 以下僅定義 Codex 專屬流程。
+# 以下僅定義 Codex 專屬流程；GitHub issue / milestone / PR 治理仍以 AGENTS.md 為準。
 
 ---
 
@@ -14,6 +14,10 @@
 2. 讀取 **本檔案**（Codex 專屬擴展）
 3. 執行 `memory-hub-sync` 的 preflight（先讀歷史）
 4. 讀取 `.ai-memory/progress/_index.md` 與最新 `context/session-*.md`
+5. 確認本次工作對應的正式 GitHub 規劃資訊：
+   - issue 編號或工作單位
+   - milestone 名稱或例外原因
+   - 若已有 PR，PR 是否與 issue / milestone 一致
 
 ---
 
@@ -27,6 +31,7 @@
 ### 變更策略
 - 優先採用最小變更，避免同時改動不相干模組。
 - 需要修改多檔案時，先列出影響範圍再執行。
+- 若變更開始跨越原 milestone 範圍，先回報再繼續，不得自行擴張交付批次。
 
 ### Commit 與記錄一致性
 - commit 摘要需可對應到 memory event 的 `summary`。
@@ -39,3 +44,4 @@
 - [ ] 任務前已執行 preflight
 - [ ] 任務後已追加事件（success 或 failed）
 - [ ] 事件已同步到 `ai-memory-hub` 且 PR 已 merged
+- [ ] 對應 issue / milestone 已確認，且本次交付沒有脫離既定 milestone

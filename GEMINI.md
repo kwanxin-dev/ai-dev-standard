@@ -4,7 +4,7 @@
 #
 # 📌 本檔案繼承 AGENTS.md 的所有共用規則。
 # 以下僅定義 Gemini 特有的能力優化與工作流程。
-# 共用規則（記憶管理、程式碼規範、邊界規則、跨 AI 協作）請參閱 AGENTS.md。
+# 共用規則（記憶管理、程式碼規範、GitHub issue / milestone / PR 治理、邊界規則、跨 AI 協作）請參閱 AGENTS.md。
 
 ---
 
@@ -16,6 +16,10 @@
 3. 讀取 `.ai-memory/progress/_index.md`（全域進度）
 4. 讀取最新的 `.ai-memory/context/session-*.md`（前次狀態）
 5. 檢查 `.ai-memory/issues/open.md`（未解決問題）
+6. 確認本次工作對應的 GitHub 規劃容器：
+   - issue 是什麼
+   - milestone 是什麼
+   - 若已有 PR，是否仍與該 issue / milestone 一致
 
 ---
 
@@ -50,7 +54,7 @@ Gemini 支援三層指令體系，從高到低依次為：
 ```
 
 **優先級**：第 3 層 > 第 2 層 > 第 1 層（就近原則）
-**注意**：第 1 層中若 AGENTS.md 與本檔案衝突，以 AGENTS.md 為準。
+**注意**：第 1 層中若 AGENTS.md 與本檔案衝突，以 AGENTS.md 為準；GitHub 規劃治理不得在下層規則中被削弱或繞過。
 
 ### 架構決策框架
 
@@ -139,6 +143,11 @@ usage_scenario: |
 | 首次正確率 | > 70% | 不需要修正的任務比例 |
 | 平均迭代次數 | < 3 次 | 從開始到完成的對話輪數 |
 | 回歸問題 | 0 | 修改後導致的新 Bug |
+
+### 交付治理補充
+
+- 回報進度時，除任務內容外，還要同步回報 milestone 完成度、剩餘 open issues 與主要阻塞。
+- 若任務評估後發現工作實際超出原 milestone，必須先回報並要求重新規劃，不得默默擴張交付範圍。
 
 ### 上下文壓縮策略（Gemini 專屬）
 

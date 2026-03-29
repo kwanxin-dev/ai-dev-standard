@@ -48,7 +48,7 @@ CLAUDE.md        CODEX.md       GEMINI.md         ANTIGRAVITY.md
 
 | 檔案 | 角色 | 內容 |
 |------|------|------|
-| **AGENTS.md** | 共用核心 | 需求決策樹、上下文工程、`.ai-memory/` 記憶管理、程式碼規範、邊界規則、跨 AI 協作規範 |
+| **AGENTS.md** | 共用核心 | 需求決策樹、上下文工程、`.ai-memory/` 記憶管理、GitHub issue / milestone / PR 治理、程式碼規範、邊界規則、跨 AI 協作規範 |
 | **CLAUDE.md** | 擴展 | 長上下文策略、子任務委派、結構化回寫、Prompt 迭代法 |
 | **CODEX.md** | 擴展 | Skill 優先觸發、最小變更策略、記憶回寫一致性 |
 | **GEMINI.md** | 擴展 | 分層指令架構、多模態運用、YAML 工具描述模板、效能追蹤指標 |
@@ -104,6 +104,16 @@ curl -sL https://raw.githubusercontent.com/<your-org>/ai-dev-standard/main/enabl
 | **Antigravity IDE** | AGENTS.md → ANTIGRAVITY.md → `*.local.md` → `.ai-memory/` |
 | **GitHub Copilot / Cursor** | AGENTS.md → `*.local.md` → `.ai-memory/` |
 
+### 跨工具一致性保證
+
+- `AGENTS.md` 是所有工具共用的 Single Source of Truth，`CLAUDE.md`、`CODEX.md`、`GEMINI.md` 只能補充專屬流程，不能削弱共用規則。
+- GitHub 的 `issue / milestone / PR` 治理屬於共用核心規則，因此 Claude、Codex、Gemini 都必須先讀 `AGENTS.md` 再執行各自擴展。
+- 三種 AI 在啟動流程中都應確認：
+  - 本次工作對應的 issue
+  - 該 issue 所屬 milestone
+  - 若已有 PR，是否仍與 issue / milestone 對齊
+- 若任何工具發現任務超出原 milestone 範圍，必須先回報並重新規劃，不得自行擴張交付邊界。
+
 ### 🔄 自動同步機制
 
 啟用後，專案會自動與中央 repo 保持同步：
@@ -142,6 +152,7 @@ curl -sL https://raw.githubusercontent.com/<your-org>/ai-dev-standard/main/enabl
 ## 🧭 工程師實作與交付流程（PR/CI 版）
 - 以 `ai/<工程師>/<任務>` 分支開發，不直接在 `主線分支` 上提交。
 - 每次提交前先補齊需求理解、最小影響檢查，並完成本地 build / 功能 smoke。
+- 任何非 trivial 工作都應有正式 GitHub issue，且原則上必須掛入 milestone；labels 只負責分類，不取代 milestone。
 - 每個分支必須先完成 `preview` 自我驗證後再提 PR。
 - 預覽網址規則（`ai/<engineer>/<task>`）：`https://<your-staging-domain>/p/<engineer>/<task>/`。
 - 專案必須在 `AGENTS.local.md` 宣告 preview 契約：`preview_mode`、`preview_base_url` / `preview_url_template`、branch/slug 規則、目標頁回報規則、以及 preview 必測端點。
@@ -165,7 +176,7 @@ curl -sL https://raw.githubusercontent.com/<your-org>/ai-dev-standard/main/enabl
 - 多工程師協作（分支策略、衝突預防、小 PR 原則）
 - AI 第一關 Review + 老闆最終 Approve 的雙層審核
 - 詳見：[新專案開發流程規範.html](./新專案開發流程規範.html)
-- GitHub 權限與合併實戰 SOP（開新專案 → 工程師加入 → 提交修改 → 管理者合併）：[github-project-lifecycle-sop.md](./github-project-lifecycle-sop.md)
+- GitHub 權限、issue / milestone / PR 規劃與合併實戰 SOP（開新專案 → 工程師加入 → 提交修改 → 管理者合併）：[github-project-lifecycle-sop.md](./github-project-lifecycle-sop.md)
 
 ---
 

@@ -222,6 +222,32 @@ CLAUDE.md        CODEX.md       GEMINI.md         ANTIGRAVITY.md
 - 🚫 不得覆寫其他 AI 的決策記錄，只能追加或標記為「已廢棄」
 - 🚫 不得修改 AGENTS.md 中的共用規則（需使用者許可）
 
+### 共用資料庫安全規範（多 AI 並行開發時強制）
+
+> 多個 AI 同時開發同一專案時，Git Worktree 或獨立目錄可隔離檔案，但資料庫是共用的。
+> 以下規範防止 DB 層的三類衝突。
+
+#### Migration 防重複執行
+- 執行任何 `ALTER TABLE`、`CREATE TABLE`、`DROP` 等 schema 變更前，**必須**透過 `schema_migrations` 表查詢是否已執行過
+- 使用專案提供的 safe migration helper，已執行過的 migration 自動跳過
+- 禁止直接在 MySQL CLI 跑 DDL 而不登記
+
+#### Trigger Ownership 鎖定
+- 修改任何 DB trigger 前，**必須**透過 `trigger_registry` 表查詢 ownership
+- 非擁有者不得修改他人的 trigger
+- 新建 trigger 必須同時在 registry 登記 owner
+
+#### 測試資料 ID 分區
+
+| 範圍 | 用途 |
+|------|------|
+| 1 – 999 | 正式資料（不可刪改） |
+| 1000 – 1999 | AI-1（如 claude）測試用 |
+| 2000 – 2999 | AI-2（如 codex）測試用 |
+| 3000 – 3999 | AI-3（如 gemini）測試用 |
+
+- 驗證筆數時排除測試資料：`SELECT COUNT(*) FROM xxx WHERE id < 1000`
+
 ---
 
 ## 🧪 階段三：後期驗證（VERIFICATION）

@@ -31,9 +31,12 @@
 ├── cicd-standard.md                   ← CI/CD 持續整合與自動部署規範
 ├── 新專案開發流程規範.html              ← 開發流程規範（HTML 視覺化版）
 ├── github-project-lifecycle-sop.md    ← GitHub 權限/PR/合併完整 SOP（實戰版）
+├── MULTI-AI-DB-SAFETY.md              ← 多 AI 共用 DB 協作安全規範
 ├── 為什麼這樣規劃_設計理念說明.html      ← 規則設計理念與背景知識
 ├── init-project.sh                    ← 一鍵初始化腳本（Linux/Mac）
 ├── init-project.ps1                   ← 一鍵初始化腳本（Windows）
+├── scripts/db-safety-init.sql         ← DB 安全表初始化腳本（schema_migrations + trigger_registry）
+├── multi-ai-examples/                 ← Safe migration helper（PHP / Node.js / Python）
 ├── .github/ISSUE_TEMPLATE/            ← GitHub issue 模板（含 milestone 欄位）
 ├── .github/PULL_REQUEST_TEMPLATE.md   ← GitHub PR 模板（強制交付欄位）
 └── example-project/                   ← 範例專案模板（可直接複製使用）
@@ -58,6 +61,7 @@ CLAUDE.md        CODEX.md       GEMINI.md         ANTIGRAVITY.md
 | **skills-development-guide.md** | 開發規範 | Skill 架構理念、資料夾結構、漸進式加載(L1→L2→L3)、確定性執行、跨工具映射、安全治理 |
 | **skills-memory-standard.md** | 治理 | Skill 中央倉 + 記憶中央倉、append-only、成功/失敗案例記錄 |
 | **cicd-standard.md** | CI/CD | SSH Key 部署、rsync 排除規則、三階段驗證、回滾策略、Secrets 管理 |
+| **MULTI-AI-DB-SAFETY.md** | DB 協作 | schema_migrations 防重複、trigger_registry 鎖定、測試資料 ID 分區 |
 
 ---
 

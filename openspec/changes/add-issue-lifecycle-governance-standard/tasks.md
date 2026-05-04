@@ -17,4 +17,4 @@
 - [x] 3.1 Run `openspec validate add-issue-lifecycle-governance-standard --strict`.
 - [x] 3.2 Run shell syntax checks for changed shell scripts.
 - [x] 3.3 Verify helper rejects close prompts with pending verification.
-- [ ] 3.4 Update GitHub Issue #15 progress with PR and verification evidence.
+- [x] 3.4 Update GitHub Issue #15 progress with PR and verification evidence.

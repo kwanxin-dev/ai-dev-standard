@@ -28,6 +28,7 @@
 ├── ANTIGRAVITY.md                     ← Antigravity IDE 專屬擴展
 ├── skills-development-guide.md         ← Skill 開發規範指南（架構/結構/加載/執行/安全）
 ├── skills-memory-standard.md          ← Skill + ai-memory-hub 治理標準草案
+├── issue-lifecycle-governance.md       ← Issue / OpenSpec / PR / memory 生命週期治理
 ├── cicd-standard.md                   ← CI/CD 持續整合與自動部署規範
 ├── 新專案開發流程規範.html              ← 開發流程規範（HTML 視覺化版）
 ├── github-project-lifecycle-sop.md    ← GitHub 權限/PR/合併完整 SOP（實戰版）
@@ -36,6 +37,8 @@
 ├── init-project.sh                    ← 一鍵初始化腳本（Linux/Mac）
 ├── init-project.ps1                   ← 一鍵初始化腳本（Windows）
 ├── scripts/db-safety-init.sql         ← DB 安全表初始化腳本（schema_migrations + trigger_registry）
+├── scripts/issue_lifecycle.sh         ← GitHub Issue 查重 / 建立 / 更新 / 驗證後關閉 helper
+├── openspec/                          ← OpenSpec 基線與變更提案範例
 ├── multi-ai-examples/                 ← Safe migration helper（PHP / Node.js / Python）
 ├── .github/ISSUE_TEMPLATE/            ← GitHub issue 模板（含 milestone 欄位）
 ├── .github/PULL_REQUEST_TEMPLATE.md   ← GitHub PR 模板（強制交付欄位）
@@ -60,6 +63,7 @@ CLAUDE.md        CODEX.md       GEMINI.md         ANTIGRAVITY.md
 | **ANTIGRAVITY.md** | 擴展 | IDE 任務啟動檢查、Skill 安裝檢核、記憶追溯要求 |
 | **skills-development-guide.md** | 開發規範 | Skill 架構理念、資料夾結構、漸進式加載(L1→L2→L3)、確定性執行、跨工具映射、安全治理 |
 | **skills-memory-standard.md** | 治理 | Skill 中央倉 + 記憶中央倉、append-only、成功/失敗案例記錄 |
+| **issue-lifecycle-governance.md** | 治理 | GitHub Issue、OpenSpec、PR、`.ai-memory` 進度同步與驗證後關閉流程 |
 | **cicd-standard.md** | CI/CD | SSH Key 部署、rsync 排除規則、三階段驗證、回滾策略、Secrets 管理 |
 | **MULTI-AI-DB-SAFETY.md** | DB 協作 | schema_migrations 防重複、trigger_registry 鎖定、測試資料 ID 分區 |
 
@@ -140,6 +144,7 @@ curl -sL https://raw.githubusercontent.com/<your-org>/ai-dev-standard/main/enabl
 ### 前期規劃（PLANNING）
 - 需求評估決策樹（API → Workflow → Agent → 混合架構）
 - System Prompt 迭代法（3-5 條 → 觀察 → 精煉）
+- Issue / OpenSpec lifecycle（問題先開或重用 Issue；新能力 / 治理變更先開 OpenSpec）
 
 ### 中期開發（DEVELOPMENT）
 - 上下文工程（資訊品質分級、卸載策略）
@@ -150,6 +155,7 @@ curl -sL https://raw.githubusercontent.com/<your-org>/ai-dev-standard/main/enabl
 ### 後期驗證（VERIFICATION）
 - 除錯 SOP（精確定位 → 最小重現 → 根因 → 最小修復）
 - Always / Ask First / Never 邊界規則
+- 完成前先驗證，再詢問是否關閉 Issue；確認後才關閉
 
 ### 跨 AI 協作
 - 統一記憶寫入格式（`[日期 | AI名]` 標注）

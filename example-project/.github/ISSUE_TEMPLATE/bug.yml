@@ -55,3 +55,14 @@ body:
         - ...
     validations:
       required: true
+  - type: textarea
+    id: lifecycle
+    attributes:
+      label: 追蹤與關閉條件
+      description: 說明是否需要 OpenSpec、驗證方式，以及完成後由誰確認才能關閉 issue。
+      placeholder: |
+        OpenSpec：不需要，原因是恢復既有行為
+        驗證：...
+        關閉確認者：...
+    validations:
+      required: true

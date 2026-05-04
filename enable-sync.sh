@@ -19,6 +19,14 @@ AI_STD_FILES=(
   "ANTIGRAVITY.md"
   "skills-development-guide.md"
   "skills-memory-standard.md"
+  "issue-lifecycle-governance.md"
+  "openspec/AGENTS.md"
+  "openspec/project.md"
+  ".github/ISSUE_TEMPLATE/feature.yml"
+  ".github/ISSUE_TEMPLATE/bug.yml"
+  ".github/ISSUE_TEMPLATE/tracked_problem.yml"
+  ".github/PULL_REQUEST_TEMPLATE.md"
+  "scripts/issue_lifecycle.sh"
 )
 
 echo "🔧 啟用 AI 開發標準自動同步"
@@ -44,6 +52,7 @@ echo ""
 echo "📥 Step 2: 下載中央標準檔案..."
 for f in "${AI_STD_FILES[@]}"; do
   URL="https://raw.githubusercontent.com/${AI_STD_REPO}/${AI_STD_REF}/${f}"
+  mkdir -p "$(dirname "$f")"
   HTTP_CODE=$(curl -sL -w "%{http_code}" -o "$f" "$URL")
   if [[ "$HTTP_CODE" == "200" ]]; then
     echo "  ✅ ${f}"
@@ -51,6 +60,10 @@ for f in "${AI_STD_FILES[@]}"; do
     echo "  ❌ ${f}（HTTP ${HTTP_CODE}）"
   fi
 done
+
+if [[ -f scripts/issue_lifecycle.sh ]]; then
+  chmod +x scripts/issue_lifecycle.sh
+fi
 
 # --- Step 3: 取得最新 commit SHA ---
 LATEST_SHA=$(curl -sL \
@@ -112,4 +125,5 @@ echo ""
 echo "中央標準檔案（自動同步，勿手動編輯）："
 echo "  - AGENTS.md, CLAUDE.md, CODEX.md, GEMINI.md, ANTIGRAVITY.md"
 echo "  - skills-development-guide.md, skills-memory-standard.md"
+echo "  - issue-lifecycle-governance.md, openspec/*, GitHub issue / PR templates"
 echo "════════════════════════════════════════════"

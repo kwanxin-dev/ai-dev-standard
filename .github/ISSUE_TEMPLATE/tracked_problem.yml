@@ -1,0 +1,63 @@
+name: Tracked Problem
+description: 追蹤非 trivial 問題、回歸、治理缺口或需要 OpenSpec 的變更
+title: "[tracked] "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        適用於需要調查、修正、OpenSpec、PR、驗證、部署判斷或完成確認的問題。
+        不得填入密碼、Token、SSH 私鑰、raw credential values 或敏感正式資料。
+  - type: textarea
+    id: problem
+    attributes:
+      label: 問題摘要
+      description: 用白話描述要解決的問題。
+    validations:
+      required: true
+  - type: input
+    id: milestone
+    attributes:
+      label: Milestone
+      description: 請填入既有 milestone；trivial 例外請填 `trivial-exception`。
+    validations:
+      required: true
+  - type: textarea
+    id: duplicate-search
+    attributes:
+      label: 查重結果
+      description: 說明已搜尋哪些症狀 / 頁面 / API / 錯誤訊息 / OpenSpec change，以及是否重用既有 issue。
+    validations:
+      required: true
+  - type: textarea
+    id: openspec
+    attributes:
+      label: OpenSpec 判斷
+      description: 若需要 OpenSpec，填 change id；若不需要，說明原因。
+      placeholder: "需要：add-xxx / 不需要：restore existing behavior"
+    validations:
+      required: true
+  - type: textarea
+    id: progress
+    attributes:
+      label: 進度總表
+      value: |
+        | Status | Owner | Branch / PR | OpenSpec | Verification | Next Action |
+        | --- | --- | --- | --- | --- | --- |
+        | accepted | _待指派_ | _pending_ | _pending_ | _pending_ | _pending_ |
+    validations:
+      required: true
+  - type: checkboxes
+    id: governance
+    attributes:
+      label: 治理確認
+      options:
+        - label: 已查重；若有相符 open issue，將重用既有 issue。
+          required: true
+        - label: 已判斷是否需要 OpenSpec，並會同步 OpenSpec tasks。
+          required: true
+        - label: 詢問是否關閉 issue 前，必須先完成驗證並附證據。
+          required: true
+        - label: 未填入密碼、Token、SSH 私鑰、raw credential values 或敏感正式資料。
+          required: true

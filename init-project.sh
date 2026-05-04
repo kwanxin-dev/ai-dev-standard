@@ -112,6 +112,36 @@ EOF
 
 echo "  ✅ .ai-memory/ 目錄建立完成"
 
+# --- 1-1. 建立 OpenSpec 目錄骨架 ---
+echo "📐 建立 OpenSpec 目錄骨架..."
+mkdir -p openspec/{changes,specs}
+
+cat > openspec/project.md << 'EOF'
+# Project Context
+
+## Purpose
+<!-- 填入專案目的 -->
+
+## Conventions
+- GitHub Issues are operational trackers.
+- OpenSpec changes are required for new capabilities, governance changes, security changes, architecture changes, and ambiguous work.
+- Keep GitHub Issue, OpenSpec tasks, PR, and .ai-memory synchronized until closeout.
+EOF
+
+cat > openspec/AGENTS.md << 'EOF'
+# OpenSpec Instructions
+
+Use OpenSpec for new capabilities, governance changes, security changes, architecture changes, and ambiguous work.
+
+Workflow:
+1. Create `openspec/changes/<change-id>/proposal.md`.
+2. Add `tasks.md`, optional `design.md`, and spec deltas under `specs/<capability>/spec.md`.
+3. Run `openspec validate <change-id> --strict`.
+4. Sync GitHub Issue, OpenSpec tasks, PR, and .ai-memory progress until confirmed closure.
+EOF
+
+echo "  ✅ OpenSpec 目錄骨架建立完成"
+
 # --- 2. 建立 GitHub Actions CI ---
 echo "📦 建立 CI/CD Pipeline..."
 mkdir -p .github/workflows
@@ -227,6 +257,53 @@ body:
       required: true
 EOF
 
+cat > .github/ISSUE_TEMPLATE/tracked_problem.yml << 'EOF'
+name: Tracked Problem
+description: 追蹤非 trivial 問題、回歸、治理缺口或需要 OpenSpec 的變更
+title: "[tracked] "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 問題摘要
+      description: 用白話描述要解決的問題。
+    validations:
+      required: true
+  - type: input
+    id: milestone
+    attributes:
+      label: Milestone
+      description: 請填入既有 milestone；trivial 例外請填 `trivial-exception`。
+    validations:
+      required: true
+  - type: textarea
+    id: duplicate-search
+    attributes:
+      label: 查重結果
+      description: 說明已搜尋哪些症狀 / 頁面 / API / 錯誤訊息 / OpenSpec change。
+    validations:
+      required: true
+  - type: textarea
+    id: openspec
+    attributes:
+      label: OpenSpec 判斷
+      description: 若需要 OpenSpec，填 change id；若不需要，說明原因。
+    validations:
+      required: true
+  - type: textarea
+    id: progress
+    attributes:
+      label: 進度總表
+      value: |
+        | Status | Owner | Branch / PR | OpenSpec | Verification | Next Action |
+        | --- | --- | --- | --- | --- | --- |
+        | accepted | _待指派_ | _pending_ | _pending_ | _pending_ | _pending_ |
+    validations:
+      required: true
+EOF
+
 cat > .github/PULL_REQUEST_TEMPLATE.md << 'EOF'
 ## Summary
 -
@@ -234,6 +311,7 @@ cat > .github/PULL_REQUEST_TEMPLATE.md << 'EOF'
 ## Issue / Milestone
 - Issue:
 - Milestone:
+- OpenSpec change:
 - 若未掛 milestone，請說明為何屬於 trivial 例外：
 
 ## Scope
@@ -247,10 +325,17 @@ cat > .github/PULL_REQUEST_TEMPLATE.md << 'EOF'
 - [ ] 已附 preview URL 或 fallback artifact 說明
 - [ ] 已列出最小驗證步驟與結果
 - [ ] required checks 全綠後才請求合併
+- [ ] 已同步 Issue 進度與 OpenSpec tasks
 
 ### Evidence
 - Preview / Artifact:
 - CI / Smoke / Healthcheck:
+
+## Issue Lifecycle Closeout
+- [ ] 已在 Issue 更新 branch / PR / OpenSpec / 驗證結果 / 下一步
+- [ ] 若要詢問是否關閉 Issue，已先完成驗證並附證據
+- [ ] 未取得使用者或授權 maintainer 明確確認前，Issue 保持 open
+- [ ] 關閉 Issue 時會附 PR、驗證證據、部署證據（若有）與 rollback reference
 
 ## Rollback
 -
@@ -319,9 +404,14 @@ AI_STD_FILES=(
   "ANTIGRAVITY.md"
   "skills-development-guide.md"
   "skills-memory-standard.md"
+  "issue-lifecycle-governance.md"
+  "openspec/AGENTS.md"
+  "openspec/project.md"
   ".github/ISSUE_TEMPLATE/feature.yml"
   ".github/ISSUE_TEMPLATE/bug.yml"
+  ".github/ISSUE_TEMPLATE/tracked_problem.yml"
   ".github/PULL_REQUEST_TEMPLATE.md"
+  "scripts/issue_lifecycle.sh"
 )
 
 DOWNLOAD_OK=true
@@ -336,6 +426,10 @@ for f in "${AI_STD_FILES[@]}"; do
     DOWNLOAD_OK=false
   fi
 done
+
+if [[ -f scripts/issue_lifecycle.sh ]]; then
+  chmod +x scripts/issue_lifecycle.sh
+fi
 
 # 取得最新 commit SHA
 LATEST_SHA=$(curl -sL \

@@ -139,6 +139,47 @@ curl -sL https://raw.githubusercontent.com/<your-org>/ai-dev-standard/main/enabl
 
 ---
 
+## 🔁 目前整套治理機制流程
+
+這套標準把「問題回報」變成一條可追蹤、可驗證、可關閉的固定流程：
+
+| 階段 | AI / 工程師要做什麼 | 產物 |
+|------|----------------------|------|
+| 1. 問題進件 | 使用者一回報非 trivial 問題，先整理症狀、受影響頁面/API/流程、錯誤訊息與期望結果。 | 問題摘要 |
+| 2. Issue 查重 | 先搜尋 open issues；有相同問題就重用，沒有才建立新 GitHub Issue。 | GitHub Issue |
+| 3. 判斷 OpenSpec | 新能力、治理流程、安全、架構或模糊需求必須建立 OpenSpec change；單純恢復既有行為的 bugfix 可註明免 OpenSpec。 | `openspec/changes/<change-id>/` |
+| 4. 開始實作 | 從最新主線開 feature branch，依 OpenSpec tasks 或 issue scope 實作最小變更。 | feature branch |
+| 5. 同步進度 | 每個 meaningful transition 都同步 Issue、OpenSpec tasks、PR 與 `.ai-memory`：accepted、planning、investigating、fixing、pr-opened、validating、deployment-decision、waiting-confirmation、closed。 | issue comment / tasks / memory |
+| 6. 開 PR | PR 必須連結 issue、milestone、OpenSpec change，並寫清楚變更摘要、風險、驗證方式與 rollback。 | Pull Request |
+| 7. 驗證 | AI 必須自行跑本地檢查、CI、preview、smoke、部署驗證或等價證據；不能只說「應該可以」。 | 驗證證據 |
+| 8. 詢問關閉 | 只有完成驗證並附證據後，AI 才能問：`#<issue> 是否已完成，是否要關閉 issue？` | waiting-confirmation |
+| 9. 自動關閉 | 使用者或授權 maintainer 明確回覆完成 / 關閉後，AI 才能關 issue，並附 PR、驗證、部署證據與 rollback reference。 | closed issue |
+
+### 關鍵規則
+
+- GitHub Issue 是正式工作單位；`.ai-memory/issues/` 只是 AI 內部記憶，不可取代 GitHub Issue。
+- OpenSpec 是新能力 / 治理 / 安全 / 架構變更的規格與 tasks，不可只靠聊天紀錄替代。
+- PR 是實作與 review 載體；未通過 required checks 不可宣告完成。
+- AI 每次問「是否關閉 issue」前，必須先完成驗證並附證據。
+- 未取得使用者或授權 maintainer 明確確認前，issue 必須保持 open。
+- issue、OpenSpec、PR、docs、`.ai-memory` 不得寫入密碼、Token、SSH 私鑰、raw credential values 或敏感正式資料。
+
+### 標準 helper
+
+新專案同步本標準後，可用：
+
+```bash
+scripts/issue_lifecycle.sh search --query "<symptom/page/error>"
+scripts/issue_lifecycle.sh create --title "<title>" --summary "<summary>" --area "<area>" --observed "<observed>" --next-action "<next>"
+scripts/issue_lifecycle.sh update --issue <number> --status pr-opened --summary "<summary>" --pr "PR #<number>" --next-action "<next>"
+scripts/issue_lifecycle.sh request-close --issue <number> --summary "<summary>" --verification "<completed evidence>" --pr "PR #<number>"
+scripts/issue_lifecycle.sh close --issue <number> --summary "<summary>" --verification "<completed evidence>" --pr "PR #<number>" --rollback "<rollback>" --confirmed-by "<name>" --confirmation-note "<note>"
+```
+
+`request-close` 只會留下等待確認留言，不會關閉 issue；`close` 必須有明確確認資訊才會關閉。
+
+---
+
 ## 📋 涵蓋的專案生命週期
 
 ### 前期規劃（PLANNING）

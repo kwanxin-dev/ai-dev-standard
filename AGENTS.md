@@ -75,6 +75,17 @@ Q3: 任務是否需要人工介入或有大量動態選項？
   - 目前主要阻塞與風險
   - 這次變更是否仍在 milestone 範圍內
 
+### Issue / OpenSpec 生命週期治理
+
+- 非 trivial 的使用者問題回報必須先建立或重用 GitHub Issue；開始前需用症狀、受影響頁面/API/流程、錯誤訊息與相關 OpenSpec change 查重。
+- 新能力、治理流程、安全、架構或模糊需求必須先建立 OpenSpec change，再開始實作；bugfix 若只是恢復既有規格可不開 OpenSpec，但仍需依非 trivial 規則追 issue。
+- GitHub Issue 是 operational tracker；OpenSpec 是規格與 tasks；PR 是實作審查；`.ai-memory` 是 append-only 里程碑記錄，四者不可互相取代。
+- meaningful transition 必須同步更新：`accepted`、`planning`、`investigating`、`fixing`、`pr-opened`、`validating`、`deployment-decision`、`waiting-confirmation`、`closed`。
+- 每次詢問是否關閉 issue 前，AI 必須先自行完成驗證並附上證據；禁止在驗證為 `pending`、`TBD`、`not run`、`待驗證` 或同等狀態時詢問關閉。
+- 只有使用者或授權 maintainer 明確確認完成後，才能關閉 issue；關閉留言必須連結 PR、驗證證據、部署證據（若有）與 rollback reference。
+- issue、OpenSpec、PR、docs、`.ai-memory` 不得包含密碼、Token、SSH 私鑰、raw credential values 或敏感正式資料。
+- 詳細 SOP 與 helper script 見 `issue-lifecycle-governance.md` 與 `scripts/issue_lifecycle.sh`。
+
 ### System Prompt 設計原則
 - 從 **3-5 條規則** 開始，不要一開始就寫長篇大論
 - 每條規則必須是 **可驗證的行為指令**，不是抽象願景

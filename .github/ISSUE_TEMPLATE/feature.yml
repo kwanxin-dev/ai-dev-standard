@@ -45,6 +45,14 @@ body:
         - ...
     validations:
       required: true
+  - type: input
+    id: openspec
+    attributes:
+      label: OpenSpec change
+      description: 新能力、治理、安全、架構或模糊需求必須填 change id；不需要請填原因。
+      placeholder: 例如：add-runtime-health-check / 不需要：trivial-exception
+    validations:
+      required: true
   - type: textarea
     id: verification
     attributes:
@@ -53,3 +61,14 @@ body:
       placeholder: 例如：CI、preview、doctor、smoke test、人工驗收
     validations:
       required: true
+  - type: checkboxes
+    id: lifecycle
+    attributes:
+      label: Issue lifecycle
+      options:
+        - label: PR 開啟後會同步 Issue / OpenSpec tasks / 驗證結果。
+          required: true
+        - label: 詢問是否關閉 Issue 前，會先完成驗證並附證據。
+          required: true
+        - label: 未填入密碼、Token、SSH 私鑰或 raw credential values。
+          required: true

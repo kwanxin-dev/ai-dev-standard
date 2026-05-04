@@ -101,6 +101,10 @@ if [[ $FAIL_COUNT -gt 0 ]]; then
   exit 1
 fi
 
+if [[ -f scripts/issue_lifecycle.sh ]]; then
+  chmod +x scripts/issue_lifecycle.sh
+fi
+
 # --- 更新元數據 ---
 python3 -c "
 import json

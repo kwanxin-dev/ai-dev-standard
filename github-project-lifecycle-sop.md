@@ -102,7 +102,27 @@
    - 主要阻塞
    - 目前是否仍在 milestone 範圍內
 
-### 8-1. CLI 快速操作（選用）
+### 8-1. Issue / OpenSpec 生命週期治理
+
+1. 非 trivial 的問題回報必須先查重，再建立或重用 GitHub Issue。
+2. 新能力、治理流程、安全、架構或模糊需求必須先開 OpenSpec change；bugfix 只恢復既有規格時可不開 OpenSpec。
+3. GitHub Issue、OpenSpec tasks、PR、`.ai-memory` 必須在 meaningful transition 同步：
+   - `accepted`
+   - `planning`
+   - `investigating`
+   - `fixing`
+   - `pr-opened`
+   - `validating`
+   - `deployment-decision`
+   - `waiting-confirmation`
+   - `closed`
+4. PR 建立後，issue 必須更新 branch、PR、目前驗證狀態與下一步；OpenSpec tasks 必須同步勾選真實完成項目。
+5. AI 詢問「是否關閉 issue」前，必須先完成驗證並附證據；禁止用 `pending`、`TBD`、`not run`、`待驗證` 等未驗證狀態要求關閉。
+6. 只有使用者或授權 maintainer 明確確認完成後，才能關閉 issue。
+7. 關閉留言必須包含 PR、驗證證據、部署證據（若有）、rollback reference 與確認者。
+8. issue / OpenSpec / PR / memory / docs 不得包含密碼、Token、SSH 私鑰、raw credential values 或敏感正式資料。
+
+### 8-2. CLI 快速操作（選用）
 
 建立 issue 時直接指定 milestone：
 
@@ -117,6 +137,16 @@ gh issue create -R <your-org>/<your-repo> \
 
 ```bash
 gh issue edit 123 -R <your-org>/<your-repo> --milestone "v0.4.0"
+```
+
+Issue lifecycle helper（若專案已同步 `scripts/issue_lifecycle.sh`）：
+
+```bash
+scripts/issue_lifecycle.sh search --query "<symptom/page/error>"
+scripts/issue_lifecycle.sh create --title "<title>" --summary "<summary>" --area "<area>" --observed "<observed>" --next-action "<next>"
+scripts/issue_lifecycle.sh update --issue <number> --status pr-opened --summary "<summary>" --pr "PR #<number>" --next-action "<next>"
+scripts/issue_lifecycle.sh request-close --issue <number> --summary "<summary>" --verification "<completed evidence>" --pr "PR #<number>"
+scripts/issue_lifecycle.sh close --issue <number> --summary "<summary>" --verification "<completed evidence>" --pr "PR #<number>" --rollback "<rollback>" --confirmed-by "<name>" --confirmation-note "<note>"
 ```
 
 ## 9. 工程師日常提交流程
